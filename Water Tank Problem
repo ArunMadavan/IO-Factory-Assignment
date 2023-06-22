@@ -1,2 +1,56 @@
-https://stackblitz.com/edit/js-sample-ajyx5r?file=index.js
-https://js-sample-ajyx5r.stackblitz.io
+(function () {
+  drawTank([0, 4, 0, 0, 0, 6, 0, 6, 4, 0]);
+})();
+
+function drawTank(input = []) {
+  // Cell Configs
+  const cellWidth = 50;
+  const cellHeight = 30;
+  const blockColor = '#FFFF00';
+  const waterColor = '#74ccf4';
+
+  const rowLength = Math.max(...input) + 1;
+  const colLength = input.length;
+  let filledCellCount = 0;
+  let maxWidth = colLength * cellWidth;
+  let maxHeight = rowLength * cellHeight;
+  const svgElement = document.getElementById('tank');
+  svgElement.setAttribute('height', maxHeight);
+  svgElement.setAttribute('width', maxWidth);
+  let childElements = ``;
+
+  let y = maxHeight - cellHeight;
+  for (let row = 0; row < rowLength; row++) {
+    let x = 0;
+    for (let col = 0; col < colLength; col++) {
+      const cellCanFill =
+        input[col] > row ? false : isCellCanFill(input, row, col);
+      filledCellCount += cellCanFill ? 1 : 0;
+      const fillValue =
+        input[col] > row ? blockColor : cellCanFill ? waterColor : '#fff';
+      childElements += `<rect x='${x}' y='${y}' width='${cellWidth}' height='${cellHeight}' fill='${fillValue}' stroke='#000'></rect>`;
+      x += cellWidth;
+    }
+    y -= cellHeight;
+  }
+  svgElement.innerHTML = childElements;
+  document.getElementById(
+    'maxCellFill'
+  ).innerHTML = `Max Cell Can fill is ${filledCellCount}`;
+}
+
+function isCellCanFill(input, row, col) {
+  if (col > 0 && col < input.length - 1) {
+    let prevBlock = Math.max(...input.slice(0, col));
+    let nextBlock = Math.max(...input.slice(col));
+    let maxRowLevel = Math.min(prevBlock, nextBlock);
+    if (row < maxRowLevel) {
+      return true;
+    }
+  } else {
+    return false;
+  }
+}
+
+
+
